@@ -1,0 +1,1271 @@
+
+******************88
+
+cat diskfull.sh 
+#!/bin/sh
+df -H | grep -vE '^Filesystem|tmpfs|cdrom' | awk '{ print $5 " " $1 }' | while read output;
+do
+  echo $output
+  usep=$(echo $output | awk '{ print $1}' | cut -d'%' -f1  )
+  partition=$(echo $output | awk '{ print $2 }' )
+  if [ $usep -ge 80 ]; then
+    echo "Running out of space \"$partition ($usep%)\" on $(hostname) as on $(date)" >> /tmp/diskfull
+    #mail -s "Alert: Almost out of disk space $usep%" nallagondu@hotmail.com
+  fi
+done
+
+*****Setup Cron job
+
+Save and install script as cronjob. Copy script to /etc/cron.daily/ (script downolad link)
+# cp diskAlert /etc/cron.daily/
+# chmod +x /etc/cron.daily/diskAlert
+
+OR install as cronjob:
+crontab -e
+
+Write cronjob as per your requirement
+10 0 * * * /path/to/diskAlert
+******
+
+******************
+#!/bin/bash
+##
+##    ListInstalledPatches.sh
+##
+USER_ID=`id | awk -F"(" '{print $2}' | awk -F")" '{print $1}'`
+echo "
+
+
+$USER_ID
+
+"
+HOSTNAME=`hostname`;
+OS=`uname`
+YEAR="2005|2006|2007|2008|2009|2010|2011|total"
+if [ "${USER_ID}" != "root" ];then
+        echo "
+
+
+        You are running this scripts as user: ${USER_ID}
+        You must run this script as user: root.
+        Please run:
+
+                sudo su -
+
+
+        Then cd to the target USER_NAME and run the script again
+        with the intended USER_NAME:
+
+                ${0} USER_NAME
+
+"
+        exit 1
+fi
+if [ "${1}" == "" ];then
+        echo "
+
+        You must provide a user name in order to run this successfully.
+                Please try again...
+
+        ${0} USER_NAME
+
+
+";
+        exit 1;
+else
+        USER_NAME=${1};
+fi;
+if [ ${OS} == "SunOS" ];then
+        cd /export/home/${USER_NAME}
+else
+        cd /home/${USER_NAME}
+fi
+if [ "${OS}" == "SunOS" ]; then
+  ls -ltr /var/sadm/patch|egrep -v ${YEAR} > `hostname`_Patch_list.txt 2>&1;
+  if [ $? == 1 ]; then
+    echo "No patches found for the date range"  > `hostname`_Patch_list.txt 2>&1;
+  fi;
+elif [ "${OS}" == "Linux" ]; then
+  rpm -qa --queryformat '%{installtime} (%{installtime:date}) %{name}\n' |egrep -v ${YEAR}  > `hostname`_Patch_list.txt 2>&1;
+  if [ $? == 1 ]; then
+    echo "No patches found for the date range"  > `hostname`_Patch_list.txt 2>&1;
+  fi;
+else
+  ls -l /var/adm/sw/products |egrep -v ${YEAR} > `hostname`_Patch_list.txt 2>&1;
+  if [ $? == 1 ]; then
+    echo "No patches found for the date range";  > `hostname`_Patch_list.txt 2>&1;
+  else
+    for i in `cat ${HOSTANAME}_Patch_list.txt|awk '{print $NF}'` ; do
+      echo $i;
+      swlist -l product $i;
+    done ;
+  fi;
+fi;
+chown $USER_NAME `hostname`_Patch_list.txt
+***************************************************************************
+ cat ListPasswordConfigurationSettings.sh
+####
+###
+##              FLEETCOR TECHNOLOGIES
+##                      IT INFRASTRUCTURE
+##                      SOX COMPLIANCE DATA COLECTION SCRIPTS
+##
+##              Created by Angel Madera July 2012
+##              Revision:
+##              Date    |       Description
+##      ----------------+----------------------------------------
+##                      |
+##                      |
+##
+###
+####
+###
+##      You must run this script as root
+##      You need to provide a user name where files output fiels will be stored chown/chmod so
+##              you will be able to scp them to your laptop/desktop
+##
+###
+####
+USER_ID=`id | awk -F"(" '{print $2}' | awk -F")" '{print $1}'`
+if [ "${USER_ID}" != "root" ];then
+        echo "
+
+
+        You are running this scripts as user: ${USER_ID}
+        You must run this script as user: root.
+        Please run:
+
+                sudo su -
+
+
+        Then cd to the target USER_NAME and run the script again
+        with the intended USER_NAME:
+
+                ${0} USER_NAME
+
+"
+        exit 1;
+fi;
+if [ "${1}" == "" ];then
+        echo "
+
+        You must provide a user name in order to run this successfully.
+                Please try again...
+
+        ${0} USER_NAME
+
+
+";
+        exit 1;
+else
+        USER_NAME=${1};
+fi;
+OS=`uname`
+#if [ ${OS} == "SunOS" ];then
+#       cd /export/home/${USER_NAME}
+#else
+#       cd /home/${USER_NAME}
+#fi
+pwd
+OSTYPE=`uname`
+if [ ${OSTYPE} == "SunOS" ];then
+    grep -v "^#" /etc/default/passwd|awk '{if(NF>=1)print;}' > `hostname`_password_file_seting.txt;
+elif [ ${OSTYPE} == "Linux" ];then
+    grep -v "^#" /etc/login.defs | awk '{if(NF>=1)print;}' > `hostname`_password_file_seting.txt;
+else
+    grep -v "^#" /etc/default/security|awk '{if(NF>=1)print;}' > `hostname`_password_file_seting.txt;
+fi
+####
+###
+##      chown/chmod files so we can remotly copy them
+###
+####
+echo "
+        Would you like to chown/chmod the txt files listed below:"
+ls -l *.txt
+echo "
+        This is the current working directory: "
+pwd
+echo "
+        Type y/Y (otherwise hit enter)"
+read CHOWN_CHMOD
+if [ "${CHOWN_CHMOD}" == "y" ] || [ "${CHMOD_CHOWN}" == "Y" ];then
+        chown ${USER_NAME} *.txt;
+        chmod o+r *.txt;
+        ls -ltr *.txt;
+fi;
+###
+##      End of Script
+###
+**********************************************************************************
+ cat ListUsersWithSuperUserAccess.sh
+####
+###
+##      This script creates a list of users with access to sudo su -
+##      It will need a file containing all the servers you will be analyzing.
+##      It will run grep the group file fo suadmin and/or wheel group members
+##      through the ssh command
+###
+####
+USER_ID=`id | awk -F"(" '{print $2}' | awk -F")" '{print $1}'`
+OS=`uname`
+if [ ! "$1" -o ! "$2" ];then
+        echo "
+
+        You must provide a file name containing all the target server names in order
+        to run this successfully.
+                Please try again...
+
+        ${0} FileNameContaingAllTheTargetServerNames USER_NAME
+
+
+";
+        exit 1;
+fi;
+if [ -f "$1" ]; then
+                SERVER_LIST=${1};
+        else
+                echo "
+        Error could not find the file name provided:${1}
+        Please try again with the correct file name.
+
+";
+                exit 2;
+fi;
+        check_USER=`passwd -s $2 2>&1 | egrep "unknown|LK|NL"|awk '{print $2}'`
+if [ ${check_USER}  ];then
+        if [ $check_USER == "User" ];then
+                check_USER="Invalid"
+        fi
+                echo "
+
+        Invalid user name provided: $2: User Status is: $check_USER
+        Please try again with a valid active user name.
+
+"
+        exit 3;
+else
+        USER_NAME=$2;
+fi;
+echo ">>>>>"$USER_NAME"<<<<<<<<<"
+#if [ ${OS} == "SunOS" ];then
+#        cd /export/home/${USER_NAME};
+#else
+#        cd /home/${USER_NAME};
+#fi;
+##
+##  Collect ListUsersWithSuperUserAccess.sh
+##
+for i in `cat $SERVER_LIST` ; do
+    echo "Server ${i}"
+    ssh ${USER_NAME}@${i} 'egrep "suadmin|wheel" /etc/group'
+done
+####
+###
+##      chown/chmod files so we can remotly copy them
+###
+####
+echo "
+        Would you like to chown/chmod the txt files listed below:"
+ls -l *.txt
+echo "
+        This is the current working directory: "
+pwd
+echo "
+        Type y/Y (otherwise hit enter)"
+read CHOWN_CHMOD
+if [ "${CHOWN_CHMOD}" == "y" ] || [ "${CHMOD_CHOWN}" == "Y" ];then
+        chown ${USER_NAME} *.txt;
+        chmod o+r *.txt;
+        ls -ltr *.txt;
+fi;
+####
+###
+##
+##      End of Script
+##
+###
+####
+******************************************************************************8888
+
+#!/bin/bash
+####
+###
+##      Generate long file listing for each root directory
+###
+####
+USER_ID=`id | awk -F"(" '{print $2}' | awk -F")" '{print $1}'`
+OS=`uname`
+HOST=`hostname`
+if [ ${USER_ID}  != "root" ];then
+        echo "
+
+     You must run this script as user root.
+
+
+";
+        exit 1;
+fi
+if [ "${1}" == "" ];then
+        echo "
+
+        You must provide a user name in order to run this successfully.
+                Please try again...
+
+        ${0} USER_NAME
+
+
+";
+        exit 1;
+else
+        USER_NAME=${1};
+fi;
+check_USER=`passwd -s ${USER_NAME} 2>&1 | egrep "unknown|LK|NL"|awk '{print $2}'`
+#echo ">>>>>"$USER_NAME"<<<<<>>>>>>>>>>>"${check_USER}"<<<<<<<"
+if [ ${check_USER}  ];then
+        if [ $check_USER == "User" ];then
+                check_USER="Invalid"
+        fi
+                echo "
+
+        Invalid user name provided: $2: User Status is: $check_USER
+        Please try again with a valid active user name.
+
+"
+        exit 3;
+else
+        USER_NAME=$1;
+fi;
+#if [ ${OS} == "SunOS" ];then
+#        cd /export/home/${USER_NAME}
+#else
+#        cd /home/${USER_NAME}
+#fi
+ls -l /|grep '^d' > ./ll
+awk '{print "ls -al /"$9}' ./ll > ./lll;
+source ./lll > ${HOST}_ls-al_for_each_root_directory.txt
+#chmod o+r ./${HOST}_ls-al_for_each_root_directory.txt
+#echo ">>>>iii>"${USER_NAME}"<<<<<>>>>>>>>>>>"${check_USER}"<<<<<<<"
+#chown ${USER_NAME} ./${HOST}_ls-al_for_each_root_directory.txt
+rm ll lll
+####
+###
+##      chown/chmod files so we can remotly copy them
+###
+####
+echo "
+        Would you like to chown/chmod the txt files listed below:"
+ls -l *.txt
+echo "
+        This is the current working directory: "
+pwd
+echo "
+        Type y/Y (otherwise hit enter)"
+read CHOWN_CHMOD
+if [ "${CHOWN_CHMOD}" == "y" ] || [ "${CHMOD_CHOWN}" == "Y" ];then
+        chown ${USER_NAME} *.txt;
+        chmod o+r *.txt;
+        ls -ltr *.txt;
+fi;
+###
+##      End of Root_Dir_ls-al_for_each_root_directory.sh
+###
+*********************************************************
+cat UserListInformationCollectionScript.sh
+####
+###
+##              FLEETCOR TECHNOLOGIES
+##                      IT INFRASTRUCTURE
+##                      SOX COMPLIANCE DATA COLECTION SCRIPTS
+##
+##              Created by Angel Madera July 2012
+##              Revision:
+##              Date    |       Description
+##      ----------------+----------------------------------------
+##                      |
+##                      |
+##
+###
+####
+###
+##      You must run this script as root
+##      You need to provide a user name where files output fiels will be stored chown/chmod so
+##              you will be able to scp them to your laptop/desktop
+##
+###
+####
+USER_ID=`id | awk -F"(" '{print $2}' | awk -F")" '{print $1}'`
+if [ "${USER_ID}" != "root" ];then
+        echo "
+
+
+        You are running this scripts as user: ${USER_ID}
+        You must run this script as user: root.
+        Please run:
+
+                sudo su -
+
+
+        Then cd to the target USER_NAME and run the script again
+        with the intended USER_NAME:
+
+                ${0} USER_NAME
+
+"
+        exit 1;
+fi;
+if [ "${1}" == "" ];then
+        echo "
+
+        You must provide a user name in order to run this successfully.
+                Please try again...
+
+        ${0} USER_NAME
+
+
+";
+        exit 1;
+else
+        USER_NAME=${1};
+fi;
+OS=`uname`
+#if [ ${OS} == "SunOS" ];then
+#       cd /export/home/${USER_NAME}
+#else
+#       cd /home/${USER_NAME}
+#fi
+pwd
+OS_TYPE=`uname`
+if [ "${OS_TYPE}" == "SunOS" ] || [ "${OS_TYPE}" == "HP-UX" ]; then
+#ls
+    HNAME=`hostname|awk -F"." '{print $1}'`
+    awk -F":" '{printf( "%10s; %40s;\n", $1, $5)}' /etc/passwd  > ${HNAME}_NoSysAct_UserList.txt
+    for i in `awk -F";" '{print $1}' ${HNAME}_NoSysAct_UserList.txt`; do
+         FLD_CNT=`passwd -s ${i}|awk '{print NF}'`;
+         ACC_STS=` passwd -s ${i}|awk '{print $2}'`;
+         if [ "${FLD_CNT}" != "2" ] && [ "${ACC_STS}" != "LK" ]; then
+              DTE_FLD=`passwd -s ${i}|awk '{print $3}'`;
+              if [ "${DTE_FLD}" == "00/00/00" ]; then
+                   MSG="PWD is Forced to reset next login;";
+              else
+                   MSG="Password last set: ${DTE_FLD};";
+              fi;
+         else
+              if [ "${ACC_STS}" == "LK" ]; then
+                   MSG="Account Status: LK user account is locked or disabled;";
+              else
+                   if [ "${ACC_STS}" == "NL" ] ; then
+                        MSG="Account Status: NL user is a no login user;";
+                   else
+                        MSG="PWD not under password rules;";
+                   fi;
+              fi;
+         fi;
+         echo ${MSG};
+    done > ll
+    for i in `awk -F":" '{print $1}' /etc/passwd` ; do
+         LAST_LOGIN=`last ${i} | grep "^${i}" | head -1`;
+        cnt=`echo ${LAST_LOGIN} | wc -l`;
+        if [ "${cnt}" == "1" ];then
+             echo "\"Last Login:${LAST_LOGIN}\";";
+        else
+             echo "\"User has not logged in since start of wtmpx file\";";
+        fi;
+    done > last_login.txt
+    paste ${HNAME}_NoSysAct_UserList.txt ll last_login.txt > ${HNAME}_user_list.txt
+elif [ "${OS_TYPE}" == "Linux" ];then
+    HNAME=`hostname|awk -F"." '{print $1}'`
+    awk -F":" '{printf( "%10s %40s\n", $1, $5)}' /etc/passwd  > ${HNAME}_NoSysAct_UserList.txt
+    for i in `awk '{print $1}' ${HNAME}_NoSysAct_UserList.txt ` ; do
+        chage -l $i|grep -i "^Password expires"|awk -F":" '{print " Expires: ",$2}' ;
+    done > ll
+    for i in `awk -F":" '{print $1}' /etc/passwd` ; do
+        cnt=`last ${i} | grep "^${i}" | head -1 | wc -l`;
+        if [ ${cnt} == "1" ];then
+             LAST_LOGIN=`last ${i} | grep "^${i}" | head -1`;
+             echo "\"Last Login:${LAST_LOGIN}\"";
+        else
+             echo "\"User has not logged in since start of wtmp file\"";
+        fi;
+    done> last_login.txt
+    paste ${HNAME}_NoSysAct_UserList.txt ll last_login.txt > ${HNAME}_user_list.txt
+fi
+####
+###
+##      Remove Temporary Files
+###
+####
+rm ${HNAME}_NoSysAct_UserList.txt ll last_login.txt
+####
+###
+##      chown/chmod files so we can remotly copy them
+###
+####
+echo "
+        Would you like to chown/chmod the txt files listed below:"
+ls -l *.txt
+echo "
+        This is the current working directory: "
+pwd
+echo "
+        Type y/Y (otherwise hit enter)"
+read CHOWN_CHMOD
+if [ "${CHOWN_CHMOD}" == "y" ] || [ "${CHMOD_CHOWN}" == "Y" ];then
+        chown ${USER_NAME} *.txt;
+        chmod o+r *.txt;
+        ls -ltr *.txt;
+fi;
+cat ${HNAME}_user_list.txt
+###
+##      End of Script
+###
+****************************************************************************************
+
+[root@ansiblenode1 src]# cat exercise6.sh 
+#!/bin/bash
+while true ;do 
+	trap "echo NOPE" INT
+	pinghost()
+	{
+		echo which host do you want to ping 
+		read HOSTNAME
+		ping -c 1 $HOSTNAME
+	}
+	echo 'select option'
+	select TASK in 'change password' 'monitor disk space ' 'ping a host ' 'process details ' 'logout'
+	do 
+		case $REPLY in 
+			1) TASK=passwd;;
+			2) TASK="df -h";;
+			3) TASK=pinghost;;
+			4) TASK="ps -aux";;
+			5) TASK=exit;;
+		esac
+	
+		if [ -n "task" ]
+		then 
+			$TASK
+			break
+		else
+			echo invalid choice #, try again 
+		fi
+	done
+done
+[root@ansiblenode1 src]# 
+cp exercise6.sh /usr/local/bin/menu
+  219  ls -l /usr/local/bin/menu 
+  220  useradd -s /usr/local/bin/menu helpdesk
+  221  passwd helpdesk
+  222  su - helpdesk
+
+**Here once we login the user helpdesk ,it will automaticaly run the stript .
+*************************************************************************************
+[root@ansiblenode1 src]# cat calculation.sh 
+#!/bin/bash
+
+logfile="$HOME/.fcalc-log"
+
+date >> $logfile
+while /bin/true; do 
+	if [ "$(expr $RANDOM % 100)" -lt "70" ]; then 
+		x=`expr $(expr $RANDOM % 4) + 6`	
+	else
+		x=`expr $RANDOM % 5`
+	fi
+	y=`expr $RANDOM % 10`
+	rep=`expr $y \* $x`
+	urep="-1"
+	
+	while [ "$urep" -ne "$rep" ]; do 
+		read -p "$y * $x = ?" urep
+		if [ "$urep" -ne "$rep" ]; then
+			echo "$y * $x = ? rep: WRONG" >> $logfile
+			beep
+		else
+			echo "$y * $x = ?: $rep: Correct" >> $logfile
+		fi
+	done	
+done
+		
+
+	
+[root@ansiblenode1 src]# 
+
+*********************************88888
+Counting Sctipt .
+
+[root@ansiblenode1 src]# cat timer.sh 
+#!/bin/bash
+COUNTER=$1
+COUNTER=$(( COUNTER * 60 ))
+maineen() {
+	  COUNTER=$(( COUNTER -1 ))
+          sleep 1
+}
+while [$COUNTER -gt 0 ]
+do 
+	echo you still have $COUNTER seconds
+        maineen
+done
+[ $COUNTER = 0 ] && echo out of time && maineen
+[ $COUNTER = "-1" ] && echo you are one second late  && maineen
+
+while true
+do
+	echo you are ${COUNTER#*-} seconds late 
+	maineen
+done
+[root@ansiblenode1 src]# 
+****************process monitoring ***
+
+COUNTER=0
+while ps aux | grep $PROCESS |grep -v grep >dev/null
+do
+	COUNTER=$((COUNTER+1))
+	sleep 1
+	echo  COUNTER is $COUNTER
+done
+
+logger PROCESSMONITOR: $PROCESS stopped at `date`
+/etc/init.d/apache2 start
+mail -s "APC Stopped" root
+
+
+
+****************
+pattern_maching.sh
+#!/bin/bash
+#
+BLAH=rababarabarabarara
+clear
+
+echo BLAH is $BLAH
+echo 'the result of ##*ba is' ${BLAH##*ba}
+echo 'the result of #*ba is ' ${BLAH#*ba}
+echo 'the result of %%ba* is ' ${BLAH%%ba*}
+echo 'the result of %ba* is ' ${BLAH%ba*}
+>>>>>>>result BLAH is rababarabarabarara
+the result of ##*ba is rara
+the result of #*ba is  barabarabarara
+the result of %%ba* is  ra
+the result of %ba* is  rababarabara
+>>>>>>>>
+
+#!/bin/bash
+
+if [ -z $1 ]; then
+	echo please provide arg: 
+	read ARG
+else
+	ARG=$1
+fi
+echo your arg was: $ARG
+**************how ARE yOU started>>>>>>>>>>>>>>>>>>>
+#!/bin/bash
+#
+echo how are you ? 
+read BLAH
+BLAH=`echo $BLAH | tr a-z A-Z`
+ [ -z $BLAH ] && exit 1
+
+case $BLAH in
+	GOOD)
+	echo nice!
+	;;
+	BAD)
+	echo too bad for you 
+	;;
+	*)
+	echo I don\'t understand your answer
+	;;
+esac
+**************How are you end<<<<<<<<<<<<>>.Start Array.sh>>>>>>
+#!/bin/bash
+
+array=(one two three four [5]=five)
+
+echo "Array size : ${#array[*]}"
+
+echo "Array items:"
+for item in ${array[*]}
+do
+        printf " %s\n" $item
+done
+
+echo "Array Indexes:"
+for index in ${!array[*]}
+do
+        printf " %d\n" $index
+done
+
+echo "Array items and indexes :"
+for index in ${!array[*]}
+do
+        printf "%4d: %s\n" $index ${array[$index]}
+done
+"array.sh" 24L, 354C
+********End Array.sh <<<<<<<<<<<<>>
+
+cat tecmint_monitor.sh 
+                  ####################################################################################################
+                  #                                        Tecmint_monitor.sh                                        #
+                  # Written for Tecmint.com for the post www.tecmint.com/linux-server-health-monitoring-script/      #
+                  # If any bug, report us in the link below                                                          #
+                  # Free to use/edit/distribute the code below by                                                    #
+                  # giving proper credit to Tecmint.com and Author                                                   #
+                  #                                                                                                  #
+                  ####################################################################################################
+#! /bin/bash
+# unset any variable which system may be using
+
+# clear the screen
+clear
+
+unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
+
+while getopts iv name
+do
+        case $name in
+          i)iopt=1;;
+          v)vopt=1;;
+          *)echo "Invalid arg";;
+        esac
+done
+
+if [[ ! -z $iopt ]]
+then
+{
+wd=$(pwd)
+basename "$(test -L "$0" && readlink "$0" || echo "$0")" > /tmp/scriptname
+scriptname=$(echo -e -n $wd/ && cat /tmp/scriptname)
+su -c "cp $scriptname /usr/bin/monitor" root && echo "Congratulations! Script Installed, now run monitor Command" || echo "Installation failed"
+}
+fi
+
+if [[ ! -z $vopt ]]
+then
+{
+echo -e "tecmint_monitor version 0.1\nDesigned by Tecmint.com\nReleased Under Apache 2.0 License"
+}
+fi
+
+if [[ $# -eq 0 ]]
+then
+{
+
+
+# Define Variable tecreset
+tecreset=$(tput sgr0)
+
+# Check if connected to Internet or not
+ping -c 1 google.com &> /dev/null && echo -e '\E[32m'"Internet: $tecreset Connected" || echo -e '\E[32m'"Internet: $tecreset Disconnected"
+
+# Check OS Type
+os=$(uname -o)
+echo -e '\E[32m'"Operating System Type :" $tecreset $os
+
+# Check OS Release Version and Name
+cat /etc/os-release | grep 'NAME\|VERSION' | grep -v 'VERSION_ID' | grep -v 'PRETTY_NAME' > /tmp/osrelease
+echo -n -e '\E[32m'"OS Name :" $tecreset  && cat /tmp/osrelease | grep -v "VERSION" | cut -f2 -d\"
+echo -n -e '\E[32m'"OS Version :" $tecreset && cat /tmp/osrelease | grep -v "NAME" | cut -f2 -d\"
+
+# Check Architecture
+architecture=$(uname -m)
+echo -e '\E[32m'"Architecture :" $tecreset $architecture
+
+# Check Kernel Release
+kernelrelease=$(uname -r)
+echo -e '\E[32m'"Kernel Release :" $tecreset $kernelrelease
+
+# Check hostname
+echo -e '\E[32m'"Hostname :" $tecreset $HOSTNAME
+
+# Check Internal IP
+internalip=$(hostname -I)
+echo -e '\E[32m'"Internal IP :" $tecreset $internalip
+
+# Check External IP
+externalip=$(curl -s ipecho.net/plain;echo)
+echo -e '\E[32m'"External IP : $tecreset "$externalip
+
+# Check DNS
+nameservers=$(cat /etc/resolv.conf | sed '1 d' | awk '{print $2}')
+echo -e '\E[32m'"Name Servers :" $tecreset $nameservers 
+
+# Check Logged In Users
+who>/tmp/who
+echo -e '\E[32m'"Logged In users :" $tecreset && cat /tmp/who 
+
+# Check RAM and SWAP Usages
+free -h | grep -v + > /tmp/ramcache
+echo -e '\E[32m'"Ram Usages :" $tecreset
+cat /tmp/ramcache | grep -v "Swap"
+echo -e '\E[32m'"Swap Usages :" $tecreset
+cat /tmp/ramcache | grep -v "Mem"
+
+# Check Disk Usages
+df -h| grep 'Filesystem\|/dev/sda*' > /tmp/diskusage
+echo -e '\E[32m'"Disk Usages :" $tecreset 
+cat /tmp/diskusage
+
+# Check Load Average
+loadaverage=$(top -n 1 -b | grep "load average:" | awk '{print $10 $11 $12}')
+echo -e '\E[32m'"Load Average :" $tecreset $loadaverage
+
+# Check System Uptime
+tecuptime=$(uptime | awk '{print $3,$4}' | cut -f1 -d,)
+echo -e '\E[32m'"System Uptime Days/(HH:MM) :" $tecreset $tecuptime
+
+# Unset Variables
+unset tecreset os architecture kernelrelease internalip externalip nameserver loadaverage
+
+# Remove Temporary Files
+rm /tmp/osrelease /tmp/who /tmp/ramcache /tmp/diskusage
+}
+fi
+shift $(($OPTIND -1))
+
+
+******************************************************END-
+#!/bin/bash
+# Shell script to get uptime, disk usage, cpu usage, RAM usage,system load,etc. 
+# from multiple Linux servers and output the information on a single server 
+# in html format. Read below for usage/installation info
+# *---------------------------------------------------------------------------*
+# * dig_remote_linux_server_information.bash,v0.1, last updated on 25-Jul-2005*
+# * Copyright (c) 2005 nixCraft project                                       *
+# * Comment/bugs: http://cyberciti.biz/fb/                                    *
+# * Ref url: http://cyberciti.biz/nixcraft/forum/viewtopic.php?t=97           *
+# * This script is licensed under GNU GPL version 2.0 or above                *
+# *---------------------------------------------------------------------------*
+# *  Installation Info                                                        *
+# ----------------------------------------------------------------------------*
+# You need to setup ssh-keys to avoid password prompt, see url how-to setup 
+# ssh-keys:
+# cyberciti.biz/nixcraft/vivek/blogger/2004/05/ssh-public-key-based-authentication.html
+# 
+# [1] You need to setup correct VARIABLES script:
+#
+# (a) Change Q_HOST to query your host to get information
+# Q_HOST="192.168.1.2 127.0.0.1 192.168.1.2"
+#
+# (b) Setup USR, who is used to connect via ssh and already setup to connect 
+# via ssh-keys
+# USR="nixcraft"
+#
+# (c)Show warning if server load average is below the limit for last 5 minute.
+# setup LOAD_WARN as per your need, default is 5.0
+#
+# LOAD_WARN=5.0
+#
+# (d) Setup your network title using MYNETINFO
+# MYNETINFO="My Network Info"
+#
+# (e) Save the file 
+#
+# Please refer to forum topic on this script: 
+# Also download the .gif files and put them in your output dir
+#
+# ----------------------------------------------------------------------------
+# Execute script as follows (and copy .gif file in this dir) :
+# this.script.name > /var/www/html/info.html
+# ============================================================================
+# This script is part of nixCraft shell script collection (NSSC)
+# Visit http://bash.cyberciti.biz/ for more information.
+# -------------------------------------------------------------------------
+ 
+# SSH SERVER HOST IPS, setup me 
+# Change this to query your host
+Q_HOST="192.168.1.2 127.0.0.1 192.168.1.2"
+ 
+# SSH USER, change me
+USR="nixcraft"
+ 
+# Show warning if server load average is below the limit for last 5 minute
+LOAD_WARN=5.0
+ 
+# Your network info
+MYNETINFO="My Network Info"
+#
+# if it  is run as cgi we can do reload stuff too :D
+PBY='Powered by <a href="http://cyberciti.biz/download/">script</a>'
+ 
+ 
+# font colours
+GREEN='<font color="#00ff00">'
+RED='<font color="#ff0000">'
+NOC='</font>'
+LSTART='<ul><li>'
+LEND='</li></ul>'
+# Local path to ssh and other bins
+SSH="/usr/bin/ssh"
+PING="/bin/ping"
+NOW="$(date)"
+ 
+## functions ##
+writeHead(){
+ echo '<HTML><HEAD><TITLE>Network Status</TITLE></HEAD>
+ <BODY alink="#0066ff" bgcolor="#000000" link="#0000ff" text="#ccddee" vlink="#0033ff">'
+ echo '<CENTER><H1>'
+ echo "$MYNETINFO</H1>"
+ echo "Generated on $NOW"
+ echo '</CENTER>'
+ 
+}
+ 
+writeFoot(){
+ echo "<HR><center>$PBY</center>"
+  echo "</BODY></HTML>"
+}
+ 
+## main ##
+ 
+writeHead
+echo '<TABLE WIDTH=100% BORDER=2 BORDERCOLOR="#000080" CELLPADDING=4 CELLSPACING=4 FRAME=HSIDES RULES=NONE" >'
+echo '<TR VALIGN=TOP>'
+for host in $Q_HOST
+do
+  #echo '<TD WIDTH=33% BGCOLOR="#0099ff">'
+  echo '<TD BGCOLOR="#0099ff">'
+  _CMD="$SSH $USR@$host"
+  rhostname="$($_CMD hostname)"
+  
+  ruptime="$($_CMD uptime)"
+  if $(echo $ruptime | grep -E "min|days" >/dev/null); then
+    x=$(echo $ruptime | awk '{ print $3 $4}')
+  else
+    x=$(echo $ruptime | sed s/,//g| awk '{ print $3 " (hh:mm)"}')
+  fi
+  ruptime="$x"
+      
+  rload="$($_CMD uptime |awk -F'average:' '{ print $2}')"
+  x="$(echo $rload | sed s/,//g | awk '{ print $2}')"
+  y="$(echo "$x >= $LOAD_WARN" | bc)"
+  [ "$y" == "1" ] && rload="$RED $rload (High) $NOC" || rload="$GREEN $rload (Ok) $NOC"
+  
+  rclock="$($_CMD date +"%r")"
+  rtotalprocess="$($_CMD ps axue | grep -vE "^USER|grep|ps" | wc -l)"
+  rfs="$($_CMD df -hT | grep -vE "^Filesystem|shm" \
+  | awk 'BEGIN{print "<ul>"}{w=sprintf("%d",$6);print "<li>" $7 \
+  "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" $6 \
+  "(" $2 ")<BR> <img src=\"indicator.gif\" height=\"4\" width=\"" w "\"> \
+  <BR><img src=\"graph.gif\"> \
+  <BR>" $4"/"$3 "</li>"}END{ print "</ul>"}')"
+ 
+  rusedram="$($_CMD free -mto | grep Mem: | awk '{ print $3 " MB" }')"
+  rfreeram="$($_CMD free -mto | grep Mem: | awk '{ print $4 " MB" }')"
+  rtotalram="$($_CMD free -mto | grep Mem: | awk '{ print $2 " MB" }')"
+ 
+  $PING -c1  $host>/dev/null
+  if [ "$?" != "0" ] ; then
+    rping="$RED Failed $NOC"   
+  else
+    rping="$GREEN Ok $NOC"
+    echo "<b><u>$rhostname</u></b><BR>" 
+    echo "Ping status: $rping<BR>"
+    echo "Time: $rclock<BR>"
+    echo "Uptime: $ruptime <BR>"
+    echo "Load avarage: $LSTART $rload $LEND"
+    echo "Total running process: $LSTART $rtotalprocess $LEND"
+    echo "Disk status:"
+    echo "$rfs"
+    echo "Ram/swap status:<ul>" 
+    echo "<li>Used RAM: $rusedram</li>" 
+    echo "<li>Free RAM: $rfreeram</li>"
+    echo "<li>Total RAM: $rtotalram </li></ul>"
+  fi   
+  
+  echo "</td>"
+done  
+  echo "</tr></table>"
+writeFoot
+
+******************END************************************************************************
+#!/usr/bin/env bash
+# Purpose: Setup an LXD vm lab quickly by creating VMs. This script:
+#      a) Attach bridge to vm
+#      b) Assign an IPv4 address
+#      c) Start VM
+#      d) Mark VM as autostart on host reboot
+# Author: Vivek Gite {https://www.cyberciti.biz/}
+# License: GPL v2.x+
+# Note: Only tested and used on Ubuntu Linux 16.04/180.4 LTS server 
+#       and Fedora 28 server.
+# Last updated: June 21 2018
+# -------------------------------------------------------------------- 
+### set me first ##
+_debug="" # either echo or ""
+_lxc="lxc"
+vm_arch='amd64'
+vm_bridge='lxdbr0'  # Your bridge interface
+vm_net_if='eth0'    # VM interface 
+vm_start_ip='10.52.230' # Vm subnet 10.114.13.xx/24
+vm_first_ip=3           # First vm IP address 10.114.13.3 and so on 
+## Customize this ##
+## Format:
+## vm_os/vm_version/vm_arch|vm-name 
+## Following will install and config VM
+# CentOS 6/7
+# Arch Linux
+# Gentoo
+# Debian 8/9
+# Fedora 27
+# OpenSuse 43.2
+# Alpine Linux 3.7
+# Sabayon 
+# Oracle 7
+# Plamo 6
+# Ubuntu 18.4 LTS
+vm_names="centos/7/${vm_arch}|centos-7 centos/6/amd64|centos-6 archlinux/${vm_arch}|arch gentoo/${vm_arch}|gentoo debian/jessie/${vm_arch}|debian-8-jessie debian/stretch/${vm_arch}|debian-9-stretch fedora/27/${vm_arch}|fedora-27 opensuse/42.3/${vm_arch}|opensuse-42-3  alpine/3.7/${vm_arch}|alpine-3-5 sabayon/${vm_arch}|sabayon oracle/7/${vm_arch}|oracle-7 plamo/6.x/${vm_arch}|plamo ubuntu/bionic/amd64|ubuntu-18-4"
+ 
+echo "Setting up LXD based VM lab...Please wait..."
+for v in $vm_names
+do
+        # Get vm_os and vm_name
+        IFS='|'
+        set -- $v
+        echo "* Creating ${2%%-*} vm...."
+        # failsafe   
+ $_debug $_lxc info "$2" &>/dev/null && continue
+        # Create vm
+        $_debug $_lxc init "images:${1}" "$2"
+        # Config networking for vm
+        $_debug $_lxc network attach "$vm_bridge" "$2" "$vm_net_if"
+        $_debug $_lxc config device set "$2" "$vm_net_if" ipv4.address "${vm_start_ip}.${vm_first_ip}"
+        # Start vm
+        $_debug $_lxc start "$2"
+        $_debug $_lxc config set "$2" boot.autostart true
+        # Increase an IP address counter 
+        (( vm_first_ip++ ))
+done
+echo "-------------------------------------------"
+echo '* VM Summary'
+echo "-------------------------------------------"
+$_lxc list
+
+
+
+********************************************************8
+
+
+#!/bin/bash
+# grabsysinfo.sh - A simple menu driven shell script to to get information about your 
+# Linux server / desktop.
+# Author: Vivek Gite
+# Date: 12/Sep/2007
+
+# Define variables
+LSB=/usr/bin/lsb_release
+
+# Purpose: Display pause prompt
+# $1-> Message (optional)
+function pause(){
+	local message="$@"
+	[ -z $message ] && message="Press [Enter] key to continue..."
+	read -p "$message" readEnterKey
+}
+
+# Purpose  - Display a menu on screen
+function show_menu(){
+    date
+    echo "---------------------------"
+    echo "   Main Menu"
+    echo "---------------------------"
+	echo "1. Operating system info"
+	echo "2. Hostname and dns info"
+	echo "3. Network info"
+	echo "4. Who is online"
+	echo "5. Last logged in users"
+	echo "6. Free and used memory info"
+	echo "7. exit"
+}
+
+# Purpose - Display header message
+# $1 - message
+function write_header(){
+	local h="$@"
+	echo "---------------------------------------------------------------"
+	echo "     ${h}"
+	echo "---------------------------------------------------------------"
+}
+
+# Purpose - Get info about your operating system
+function os_info(){
+	write_header " System information "
+	echo "Operating system : $(uname)"
+	[ -x $LSB ] && $LSB -a || echo "$LSB command is not insalled (set \$LSB variable)"
+	#pause "Press [Enter] key to continue..."
+	pause
+}
+
+# Purpose - Get info about host such as dns, IP, and hostname
+function host_info(){
+	local dnsips=$(sed -e '/^$/d' /etc/resolv.conf | awk '{if (tolower($1)=="nameserver") print $2}')
+	write_header " Hostname and DNS information "
+	echo "Hostname : $(hostname -s)"
+	echo "DNS domain : $(hostname -d)"
+	echo "Fully qualified domain name : $(hostname -f)"
+	echo "Network address (IP) :  $(hostname -i)"
+	echo "DNS name servers (DNS IP) : ${dnsips}"
+	pause
+}
+
+# Purpose - Network inferface and routing info
+function net_info(){
+	devices=$(netstat -i | cut -d" " -f1 | egrep -v "^Kernel|Iface|lo")
+	write_header " Network information "
+	echo "Total network interfaces found : $(wc -w <<<${devices})"
+
+	echo "*** IP Addresses Information ***"
+	ip -4 address show
+
+	echo "***********************"
+	echo "*** Network routing ***"
+	echo "***********************"
+	netstat -nr
+
+	echo "**************************************"
+	echo "*** Interface traffic information ***"
+	echo "**************************************"
+	netstat -i
+
+	pause 
+}
+
+# Purpose - Display a list of users currently logged on 
+#           display a list of receltly loggged in users   
+function user_info(){
+	local cmd="$1"
+	case "$cmd" in 
+		who) write_header " Who is online "; who -H; pause ;;
+		last) write_header " List of last logged in users "; last ; pause ;;
+	esac 
+}
+
+# Purpose - Display used and free memory info
+function mem_info(){
+	write_header " Free and used memory "
+	free -m
+    
+    echo "*********************************"
+	echo "*** Virtual memory statistics ***"
+    echo "*********************************"
+	vmstat
+    echo "***********************************"
+	echo "*** Top 5 memory eating process ***"
+    echo "***********************************"	
+	ps auxf | sort -nr -k 4 | head -5	
+	pause
+}
+# Purpose - Get input via the keyboard and make a decision using case..esac 
+function read_input(){
+	local c
+	read -p "Enter your choice [ 1 - 7 ] " c
+	case $c in
+		1)	os_info ;;
+		2)	host_info ;;
+		3)	net_info ;;
+		4)	user_info "who" ;;
+		5)	user_info "last" ;;
+		6)	mem_info ;;
+		7)	echo "Bye!"; exit 0 ;;
+		*)	
+			echo "Please select between 1 to 7 choice only."
+			pause
+	esac
+}
+
+# ignore CTRL+C, CTRL+Z and quit singles using the trap
+trap '' SIGINT SIGQUIT SIGTSTP
+
+# main logic
+while true
+do
+	clear
+ 	show_menu	# display memu
+ 	read_input  # wait for user input
+done
+
+
+****************
+
+Understand loops
+for i in 10.0.0.{1,2,3}; do echo $i; done
+for i in $(cat filename); do echo $i; done
+for i in $(seq 1 10); do echo $i; done
+for i in {0..10..2}; do echo welcome $i times ; done while loops
+
+
+
+
+-e
+file exists
+-f
+file is a regular file (not a directory or device file)
+-s
+file is not zero size
+-d
+file is a directory
+-b
+file is a block device
+-c
+file is a character device
+
+
+Configuration file: “/etc/syslogd.conf” or “/etc/rsyslog.conf”
+# yum install syslogd
+# service syslogd start
+
+Remote logging
+There might be 1000’s of servers, which logs events. It might not be practical to log onto each server and capture logs
+To address this, there is an option to enable remote logging to a central server
+# vi /etc/sysconfig/syslog
+SYSLOGD_OPTIONS=“ –r –x 0”
+
+The user-space Audit daemon collects the information from the kernel and creates log file entries in a log file
+Other Audit user-space utilities interact with the Audit daemon, the kernel Audit component, or the Audit log
+files:
+audisp – the Audit dispatcher daemon interacts with the Audit daemon and send events to other applications
+for further processing. The purpose of this daemon is to provide a plug-in mechanism so that real-time
+analytical programs can interact with Audit events
+auditctl – the Audit control utility interacts with the kernel Audit component to control a number of settings
+and parameters of the event generation process
+
+*****************
+mkdir -p /home/ansible/serverdata
+
+
+for i in `cat /home/ansible/.ssh/mytask.txt`; do echo $i; sshpass  ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=2 $i "echo'#####HOSTNAME is ####' >> serverinfo$i.txt && hostname >> serverinfo$i.txt && echo '#####IPADDRESS is #####' >> serverinfo$i.txt && hostname -I >> serverinfo$i.txt && echo '#####GATEWAY is #####' >> serverinfo$i.txt &&  ip route | awk '/default/ { print $3 }' >> serverinfo$i.txt && echo '#####MAC ADDRESS is #####' >> serverinfo$i.txt && ip addr show |grep link/ether | awk '{print $2}' >> serverinfo$i.txt && echo '#####END#####' >>serverinfo$i.txt" ; sshpass  scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r serverinfo$i.txt <server hostname>:/home/ansible/serverdata/ ; done
+
+
+
+*************
+
+---
+- hosts: node2
+  user: ansible
+  become: yes
+  tasks:
+     - name: "Installing Docker Prerequisite packages"
+       yum:
+       name: "{{ item }}"
+       state: latest
+       with_items:
+- yum-utils
+- device-mapper-persistent-data
+- lvm2
+     - name: "Configuring docker-ce repo"
+       get_url:
+       url: https://download.docker.com/linux/centos/docker-ce.repo
+       dest: /etc/yum.repos.d/docker-ce.repo
+       mode: 0644
+     - name: " Installing Docker latest version"
+       yum:
+       name: docker-ce
+       state: present
+      - name: " Starting and Enabling Docker service"
+        service:
+        name: docker
+        state: started
+        enabled: yes
+*********************
