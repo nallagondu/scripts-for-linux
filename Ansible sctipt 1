@@ -1,0 +1,1281 @@
+
+delete a file from path : 
+
+ansible all -m file -a "dest=/tmp/hosts state=absent"
+
+user removal : 
+
+ansible all -m user -a "name=tset state=absent"
+
+
+ssh ansiblenode1 ls /tmp/
+
+***********************8
+   6  exit
+    7  sudo -s 
+    8  ssh test@172.31.14.111
+    9  clear
+   10  pwd
+   11  ssh-keygen 
+   12  ssh-copy-id 172.31.5.150
+   13  ssh 172.31.5.150
+   14  ssh-copy-id 172.31.14.111
+   15  ssh-copy-id 172.31.4.75
+   16  ssh 172.31.4.75
+   17  ssh  172.31.14.111
+   18  ssh 172.31.5.150
+   19  clear
+   20  ifconfig 
+   21  ssh 172.31.5.150
+   22  clear
+   23  sudo yum repolist 
+   24  wget
+   25  yum install wget
+   26  ping google.com
+   27  ping dl.fedoraproject.org
+   28  sudo init 6
+   29  sudo yum install wget
+   30  wget http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-7.noarch.rpm
+   31  cd ~test
+   32  wget http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-7.noarch.rpm
+   33  wget http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-9.noarch.rpm
+   34  rpm -ivh epel-release-7-9.noarch.rpm
+   35  ls
+   36  sudo rpm -ivh epel-release-7-9.noarch.rpm
+   37  sudo yum update
+   38  sudo yum install ansible -y
+   39  ansible --version
+   40  cd /etc/ansible/ansible.cfg 
+   41  more /etc/ansible/ansible.cfg 
+   42  sudo vi  /etc/ansible/ansible.cfg 
+   43  clear
+   44  ansible --version
+   45  sudo touch /var/log/ansible.log
+   46  history 
+*********************************
+%comdata^unix^admins    ALL=(ALL)       NOPASSWD: ALL
+%unixadmins    ALL=(ALL)       NOPASSWD: ALL
+%unix^server^admins    ALL=(ALL)       NOPASSWD: ALL
+%unix^storm^admin     ALL=(ALL)       NOPASSWD: ALL
+%apps-comdata^websphere^admins    ALL=(ALL)       NOPASSWD: ALL
+%server^access^-^all^prod    ALL=(ALL)       NOPASSWD: ALL
+%webadmins       ALL=(wasadmin) NOPASSWD: ALL
+svc_dplyadm     ALL=(devadmin) NOPASSWD: /bin/bash
+sparsi          ALL=(ALL)       NOPASSWD: /bin/su - devadmin
+
+
+*******************************************************************
+getent  group | grep -i admin
+
+
+[root@tbvlstorm2 ansible]# getent  group | grep -i admin
+unixadmins:x:50000:malgol,akolanga
+webadmins:x:50001:
+devadmin:x:500:svc_dplyadm,sparsi
+schema^admins:x:1186464262:
+enterprise^admins:x:1186464263:
+domain^admins:x:1186464256:
+dnsadmins:x:1186464849:
+apps-authrpts^admins:x:1186466875:
+apps-iss^data^admin:x:1186466886:
+apps-ops^admins:x:1186466891:
+apps-opsbhm^admin:x:1186466892:
+apps-opscr^admins:x:1186466894:
+apps-opsctsadmin:x:1186466897:
+apps-opsdb^admin:x:1186466898:
+apps-opsfr^admins^rw:x:1186466899:
+apps-opslav^admins:x:1186466901:
+apps-opsrcs^admin:x:1186466905:
+apps-opsrcsmis^admin:x:1186466907:
+apps-opssvs^admins:x:1186466909:
+edwadminpagers:x:1186493017:
+oa^admins:x:1186495398:
+unix^dev^admin:x:1186490008:sbarnard,msun
+unix^mobile^admins:x:1186490017:
+unix^netcool^admins:x:1186482163:
+unix^storm^admin:x:1186482165:sbarnard
+unix^bomgar^administrators:x:1186492791:
+apps-citrix-avaya-siteadministrator:x:1186495513:
+mw-appadmins:x:1186495986:
+data^protection^admins:x:1186496856:
+apps-netbrain^admins:x:1186496124:
+websphere^deployment^admin:x:1186496384:
+unix^svs^admins:x:1186482186:
+unix^admins^svrs:x:1186496921:
+*****************************************************8888888
+How to remove the ldap user form multiple servers ?
+what is the passwd for Ldap User admin ? 
+Please Stop working on  user termination tickets .
+**************************************************************************
+Hi Team ,
+
+Please stop working for user termination tickets,becuase all user termination process was going wronge way . all given users are  related to Ldap users not for local users.
+ Today we have to discuss with Ray/Angel for more details  after discussion with Our Manager.
+
+
+Here we have to know the below query's :
+
+1.How to remove the ldap user form multiple servers ?  / in Single Server .
+2..what is the password for Ldap User admin / what is the  server name /credentials .
+
+
+******************
+IsholaGaba@fleetcor.com ;fcops@fleetcor.com; fcunix@fleetcor.com;
+
+
+As we found this user is related to LDAP ,we are moving this ticket to Windows team .
+
+
+
+
+****************************
+bedwdbppa03
+uslvtln001
+uswchqatln001
+Deepak Subramani (extdsubramani) 
+
+useradd –md /home/extdsubramani –c “Deepak Subramani” –g dba extdsubramani;passwd extdsubramani
+
+*********************************************
+Rama Chandran V (extramav)
+
+
+useradd –md /home/extramav –c “Rama Chandran V” –g prdadmin extramav;passwd extramav
+***************************
+1.
+
+---
+- name: install apache & php & mysql
+  hosts: test-servers
+  become: true
+  become_user: root
+  gather_facts: true
+  tasks:
+    - name: "Install apache2"
+     package: name=apache2 state=present
+    - name: "install apache2-php5"
+     package: name=libapache2-mod-php state=present
+    - name: "Install php_cli"
+      package: name=php-cli state=present
+    - name: "Install php-mcrypt"
+      package: name=php-mcrypt state=present
+    - name: "Install php-gd"
+      package: name= php-gd state=present
+    - name: "Install php-mysql"
+      package: name=php-mysql state=present
+    - name: "Install mysqlserver"
+      package: name=mysql-server state=present
+
+
+*****************************
+version: "2"
+services:
+  web:
+    build:
+    command: '/bin/bash -l -c "bundle exec unicorn -c config/unicorn"'
+    ports:
+       - RAILS_ENV=development
+       - PORT=3000
+    volumes:
+       -"./config/diaspora.yml:/home/diaspora/config/diaspora.yml"
+       -"./config/database.yml:/home/diaspora/config/database.yml"
+    links:
+      - "db:db"
+   db:
+     image: postgres:latest
+
+********************************************
+https://sachinsharm.wordpress.com/2013/08/11/setup-and-configure-nagios-client-nrpe-on-centosrhel-6-3/
+
+https://www.tutorialspoint.com/openshift/openshift_pdf_version.htm*
+
+
+**********************************
+
+File Transfer :
+
+Here’s another use case for the /usr/bin/ansible command line. Ansible can SCP lots of files to multiple machines in parallel.
+
+To transfer a file directly to many servers:
+
+$ ansible atlanta -m copy -a "src=/etc/hosts dest=/tmp/hosts"
+
+If you use playbooks, you can also take advantage of the template module, which takes this another step further. (See module and playbook documentation).
+
+The file module allows changing ownership and permissions on files. These same options can be passed directly to the copy module as well:
+
+$ ansible webservers -m file -a "dest=/srv/foo/a.txt mode=600"
+$ ansible webservers -m file -a "dest=/srv/foo/b.txt mode=600 owner=mdehaan group=mdehaan"
+
+The file module can also create directories, similar to mkdir -p:
+
+$ ansible webservers -m file -a "dest=/path/to/c mode=755 owner=mdehaan group=mdehaan state=directory"
+
+As well as delete directories (recursively) and delete files:
+
+$ ansible webservers -m file -a "dest=/path/to/c state=absent"
+
+Managing Packages
+
+There are modules available for yum and apt. Here are some examples with yum.
+
+Ensure a package is installed, but don’t update it:
+
+$ ansible webservers -m yum -a "name=acme state=present"
+
+Ensure a package is installed to a specific version:
+
+$ ansible webservers -m yum -a "name=acme-1.5 state=present"
+
+Ensure a package is at the latest version:
+
+$ ansible webservers -m yum -a "name=acme state=latest"
+
+Ensure a package is not installed:
+
+$ ansible webservers -m yum -a "name=acme state=absent"
+
+Ansible has modules for managing packages under many platforms. If there isn’t a module for your package manager, you can install packages using the command module or (better!) contribute a module for your package manager. Stop by the mailing list for info/details.
+Users and Groups
+
+The ‘user’ module allows easy creation and manipulation of existing user accounts, as well as removal of user accounts that may exist:
+
+$ ansible all -m user -a "name=foo password=<crypted password here>"
+
+$ ansible all -m user -a "name=foo state=absent"
+
+See the About Modules section for details on all of the available options, including how to manipulate groups and group membership.
+Deploying From Source Control
+
+Deploy your webapp straight from git:
+
+$ ansible webservers -m git -a "repo=git://foo.example.org/repo.git dest=/srv/myapp version=HEAD"
+
+Since Ansible modules can notify change handlers it is possible to tell Ansible to run specific tasks when the code is updated, such as deploying Perl/Python/PHP/Ruby directly from git and then restarting apache.
+Managing Services
+
+Ensure a service is started on all webservers:
+
+$ ansible webservers -m service -a "name=httpd state=started"
+
+Alternatively, restart a service on all webservers:
+
+$ ansible webservers -m service -a "name=httpd state=restarted"
+
+Ensure a service is stopped:
+
+$ ansible webservers -m service -a "name=httpd state=stopped"
+
+Time Limited Background Operations
+
+Long running operations can be run in the background, and it is possible to check their status later. For example, to execute long_running_operation asynchronously in the background, with a timeout of 3600 seconds (-B), and without polling (-P):
+
+$ ansible all -B 3600 -P 0 -a "/usr/bin/long_running_operation --do-stuff"
+
+If you do decide you want to check on the job status later, you can use the async_status module, passing it the job id that was returned when you ran the original job in the background:
+
+$ ansible web1.example.com -m async_status -a "jid=488359678239.2844"
+
+Polling is built-in and looks like this:
+
+$ ansible all -B 1800 -P 60 -a "/usr/bin/long_running_operation --do-stuff"
+
+The above example says “run for 30 minutes max (-B 30*60=1800), poll for status (-P) every 60 seconds”.
+
+Poll mode is smart so all jobs will be started before polling will begin on any machine. Be sure to use a high enough --forks value if you want to get all of your jobs started very quickly. After the time limit (in seconds) runs out (-B), the process on the remote nodes will be terminated.
+
+Typically you’ll only be backgrounding long-running shell commands or software upgrades. Backgrounding the copy module does not do a background file transfer. Playbooks also support polling, and have a simplified syntax for this.
+Gathering Facts
+
+Facts are described in the playbooks section and represent discovered variables about a system. These can be used to implement conditional execution of tasks but also just to get ad-hoc information about your system. You can see all facts via:
+
+$ ansible all -m setup
+
+It’s also possible to filter this output to just export certain facts, see the “setup” module documentation for details.
+***************************************
+
+
+[root@ansiblemaster ansible]# more usercreation.yml 
+---
+- hosts: all
+  user: root
+  vars: 
+    createuser: 'ansibleremote'
+    createpassword: 'redhat'
+  tasks:
+  - name: Setup | create user
+    command: useradd -m {{ createuser }} creates=/home/{{ createuser }}
+    sudo: true
+ 
+  - name: Setup | set user password
+    shell: usermod -p $(echo '{{ createpassword }}' | openssl passwd -1 -stdin) {{ createuser }}
+    sudo: true
+ 
+  #- name: Setup | authorized key upload
+  #  authorized_key: user={{ createuser }}
+  #    key="{{ lookup('file', '.pub') }}"
+  #    path='/home/{{ createuser }}/.ssh/authorized_keys'
+  #    manage_dir=no
+  #  sudo: true
+ 
+  - name: Sudoers | update sudoers file and validate
+    lineinfile: "dest=/etc/sudoers
+      insertafter=EOF
+      line='{{ createuser }} ALL=(ALL) NOPASSWD: ALL'
+      regexp='{{ createuser }} ALL=(ALL) NOPASSWD: ALL'
+      state=present"
+    sudo: true
+
+
+********************************************************
+ ansible-playbook -v -i /etc/ansible/linuxlist   -e users_pass="kareem.sutton" --vault-password-file=/etc/ansible/secrets/vau
+lt.txt /etc/ansible/playbooks/ansible-remove_users.yml
+********************************
+  ansible-playbook -e "@var_user_file"  -v -i ../testserverlist  --vault-password-file=/etc/ansible/secrets/vault.txt /etc/ansible/playbooks/AddUNIXUser.yml
+
+
+
+ users_id: user_ID needed using the following rule: first letter of First name and upto 7 letters of last name
+·         comments_desc: the comments/description field: we need at a minimum First and Last name, department and what he does. Keep in mind the text needs to be with in the single ticks “'” please see below.
+·         groups_needed : what groups the user needs to belong to. Use comma “,” to separate multiple groups(no spaces between group names).
+·         encrypted_password : encrypt the users default password password should be 1!USER_ID.001 encrypt the password running /etc/ansible/playbooks/pass_encrypt.sh (it will prompt for the desired password twice and print the encrypted password). Use that output to replace the password. Make sure you copy/paste the entire output of the pass_encrypt.sh output.
+Update file:
+/etc/ansible/playbooks/var_user_file replacing the following fields in RED:
+users_id: malgol
+comments_desc: 'MANJUNATREDDY ALGOL SA IBM Contractor'
+groups_needed: suadmin
+encrypted_password: $6$cFnK/HTaQorJ3NaJ$0QoezbShJUtEs
+Update the /etc/ansible/create_user_account_server_list to include the servers the account is needed on (one server name per line)
+
+run the following ansible command:
+cd /etc/ansible/playbooks
+ansible-playbook -e "@var_user_file"  -v -i ../create_user_account_server_list  --vault-password-file=/etc/ansible/secrets/vault.txt /etc/ansible/playbooks/AddUNIXUser.yml
+ 
+A little explanation: var_user_file contains the value for the variables defined in the AddUNIXUser.yml playbook for ansible to use while creating the account.
+ 
+If you get a failed=1, that means that for the reason listed ansible could not create the account using the playbook provided. For now, you will have to add the account manually:
+ 
+Create the user account:
+useradd –md /home/USER_ID –c “USER COMMENT DESCRIPTION” –g comma_separated_group_list USER_ID
+****************************************************
+[‎4/‎27/‎2017 1:00 PM] Sivasankar Perugupalli: 
+Hi
+try to login PCi Jump server
+then login to usatlav01
+
+here you have putty
+[‎4/‎27/‎2017 1:01 PM] Gangireddy Nallagondu: 
+can you share me pci jump servers
+[‎4/‎27/‎2017 1:01 PM] Sivasankar Perugupalli: 
+then try to access server which not access by you
+you have to login f5
+https://gfn-us.fleetcor.com/vdesk/webtop.eui?webtop=/Common/PCI_Portal_Access_Policy1_webtop&webtop_type=webtop_full
+
+***************************************
+
+usatltln002
+ 
+ usatladm01 
+
+**********************
+./dmidecode |grep VM
+****************************************
+#!/bin/bash
+##
+##    ListInstalledPatches.sh
+##
+USER_ID=`id | awk -F"(" '{print $2}' | awk -F")" '{print $1}'`
+HOSTNAME=`hostname`;
+OS=`uname`
+YEAR="2005|2006|2007|2008|2009|2010|2011|total"
+if [ "${USER_ID}" != "root" ];then
+        echo "
+
+
+        You are running this scripts as user: ${USER_ID}
+        You must run this script as user: root.
+        Please run:
+
+                sudo su -
+
+
+        Then cd to the target USER_NAME and run the script again
+        with the intended USER_NAME:
+
+                ${0} USER_NAME
+
+"
+        exit 1
+fi
+if [ "${1}" == "" ];then
+        echo "
+
+        You must provide a user name in order to run this successfully.
+                Please try again...
+
+        ${0} USER_NAME
+
+
+";
+        exit 1;
+else
+        USER_NAME=${1};
+fi;
+#if [ ${OS} == "SunOS" ];then
+#        cd /export/home/${USER_NAME}
+#else
+#        cd /home/${USER_NAME}
+#fi
+if [ "${OS}" == "SunOS" ]; then
+  ls -ltr /var/sadm/patch|egrep -v ${YEAR} > `hostname`_Patch_list.txt 2>&1;
+  if [ $? == 1 ]; then
+    echo "No patches found for the date range"  > `hostname`_Patch_list.txt 2>&1;
+  fi;
+elif [ "${OS}" == "Linux" ]; then
+  rpm -qa --queryformat '%{installtime} (%{installtime:date}) %{name}\n' |egrep -v ${YEAR}  > `hostname`_Patch_list.txt 2>&1;
+  if [ $? == 1 ]; then
+    echo "No patches found for the date range"  > `hostname`_Patch_list.txt 2>&1;
+  fi;
+else
+  ls -l /var/adm/sw/products |egrep -v ${YEAR} > `hostname`_Patch_list.txt 2>&1;
+  if [ $? == 1 ]; then
+    echo "No patches found for the date range";  > `hostname`_Patch_list.txt 2>&1;
+  else
+    for i in `cat ${HOSTANAME}_Patch_list.txt|awk '{print $NF}'` ; do
+      echo $i;
+      swlist -l product $i;
+    done ;
+  fi;
+fi;
+************************************
+ cat Root_Dir_ls-al_for_each_root_directory.sh
+#!/bin/bash
+####
+###
+##      Generate long file listing for each root directory
+###
+####
+USER_ID=`id | awk -F"(" '{print $2}' | awk -F")" '{print $1}'`
+OS=`uname`
+HOST=`hostname`
+if [ ${USER_ID}  != "root" ];then
+        echo "
+
+     You must run this script as user root.
+
+
+";
+        exit 1;
+fi
+if [ "${1}" == "" ];then
+        echo "
+
+        You must provide a user name in order to run this successfully.
+                Please try again...
+
+        ${0} USER_NAME
+
+
+";
+        exit 1;
+else
+        USER_NAME=${1};
+fi;
+check_USER=`passwd -s ${USER_NAME} 2>&1 | egrep "unknown|LK|NL"|awk '{print $2}'`
+#echo ">>>>>"$USER_NAME"<<<<<>>>>>>>>>>>"${check_USER}"<<<<<<<"
+if [ ${check_USER}  ];then
+        if [ $check_USER == "User" ];then
+                check_USER="Invalid"
+        fi
+                echo "
+
+        Invalid user name provided: $2: User Status is: $check_USER
+        Please try again with a valid active user name.
+
+"
+        exit 3;
+else
+        USER_NAME=$1;
+fi;
+#if [ ${OS} == "SunOS" ];then
+#        cd /export/home/${USER_NAME}
+#else
+#        cd /home/${USER_NAME}
+#fi
+ls -l /|grep '^d' > ./ll
+awk '{print "ls -al /"$9}' ./ll > ./lll;
+source ./lll > ${HOST}_ls-al_for_each_root_directory.txt
+#chmod o+r ./${HOST}_ls-al_for_each_root_directory.txt
+#echo ">>>>iii>"${USER_NAME}"<<<<<>>>>>>>>>>>"${check_USER}"<<<<<<<"
+#chown ${USER_NAME} ./${HOST}_ls-al_for_each_root_directory.txt
+rm ll lll
+####
+###
+##      chown/chmod files so we can remotly copy them
+###
+####
+echo "
+        Would you like to chown/chmod the txt files listed below:"
+ls -l *.txt
+echo "
+        This is the current working directory: "
+pwd
+echo "
+        Type y/Y (otherwise hit enter)"
+read CHOWN_CHMOD
+if [ "${CHOWN_CHMOD}" == "y" ] || [ "${CHMOD_CHOWN}" == "Y" ];then
+        chown ${USER_NAME} *.txt;
+        chmod o+r *.txt;
+        ls -ltr *.txt;
+fi;
+###
+##      End of Root_Dir_ls-al_for_each_root_directory.sh
+###
+
+
+******************************************************************
+
+# cat ListPasswordConfigurationSettings.sh
+####
+###
+##              FLEETCOR TECHNOLOGIES
+##                      IT INFRASTRUCTURE
+##                      SOX COMPLIANCE DATA COLECTION SCRIPTS
+##
+##              Created by Angel Madera July 2012
+##              Revision:
+##              Date    |       Description
+##      ----------------+----------------------------------------
+##                      |
+##                      |
+##
+###
+####
+###
+##      You must run this script as root
+##      You need to provide a user name where files output fiels will be stored chown/chmod so
+##              you will be able to scp them to your laptop/desktop
+##
+###
+####
+USER_ID=`id | awk -F"(" '{print $2}' | awk -F")" '{print $1}'`
+if [ "${USER_ID}" != "root" ];then
+        echo "
+
+
+        You are running this scripts as user: ${USER_ID}
+        You must run this script as user: root.
+        Please run:
+
+                sudo su -
+
+
+        Then cd to the target USER_NAME and run the script again
+        with the intended USER_NAME:
+
+                ${0} USER_NAME
+
+"
+        exit 1;
+fi;
+if [ "${1}" == "" ];then
+        echo "
+
+        You must provide a user name in order to run this successfully.
+                Please try again...
+
+        ${0} USER_NAME
+
+
+";
+        exit 1;
+else
+        USER_NAME=${1};
+fi;
+OS=`uname`
+#if [ ${OS} == "SunOS" ];then
+#       cd /export/home/${USER_NAME}
+#else
+#       cd /home/${USER_NAME}
+#fi
+pwd
+OSTYPE=`uname`
+if [ ${OSTYPE} == "SunOS" ];then
+    grep -v "^#" /etc/default/passwd|awk '{if(NF>=1)print;}' > `hostname`_password_file_seting.txt;
+elif [ ${OSTYPE} == "Linux" ];then
+    grep -v "^#" /etc/login.defs | awk '{if(NF>=1)print;}' > `hostname`_password_file_seting.txt;
+else
+    grep -v "^#" /etc/default/security|awk '{if(NF>=1)print;}' > `hostname`_password_file_seting.txt;
+fi
+####
+###
+##      chown/chmod files so we can remotly copy them
+###
+####
+echo "
+        Would you like to chown/chmod the txt files listed below:"
+ls -l *.txt
+echo "
+        This is the current working directory: "
+pwd
+echo "
+        Type y/Y (otherwise hit enter)"
+read CHOWN_CHMOD
+if [ "${CHOWN_CHMOD}" == "y" ] || [ "${CHMOD_CHOWN}" == "Y" ];then
+        chown ${USER_NAME} *.txt;
+        chmod o+r *.txt;
+        ls -ltr *.txt;
+fi;
+###
+##      End of Script
+###
+****************************************************************
+
+# cat Run_SOX_Audit_Scripts.sh
+####
+###
+##              FLEETCOR TECHNOLOGIES
+##                      IT INFRASTRUCTURE
+##                      SOX COMPLIANCE DATA COLECTION SCRIPTS
+##
+##              Created by Angel Madera July 2012
+##              Revision:
+##              Date    |       Description
+##      ----------------+----------------------------------------
+##                      |
+##                      |
+##
+###
+####
+###
+##
+##      You must run this script as root
+##      You need to provide a user name where files output fiels will be stored chown/chmod so
+##              you will be able to scp them to your laptop/desktop
+##
+###
+####
+USER_ID=`id | awk -F"(" '{print $2}' | awk -F")" '{print $1}'`
+if [ "${USER_ID}" != "root" ];then
+        echo "
+
+
+        You are running this scripts as user: ${USER_ID}
+        You must run this script as user: root.
+        Please run:
+
+                sudo su -
+
+
+        Then cd to the target USER_NAME and run the script again
+        with the intended USER_NAME:
+
+                ${0} USER_NAME
+
+"
+        exit 1;
+fi;
+if [ "${1}" == "" ];then
+        echo "
+
+        You must provide a user name in order to run this successfully.
+                Please try again...
+
+        ${0} USER_NAME
+
+
+";
+        exit 1;
+else
+        USER_NAME=${1};
+fi;
+OS=`uname`
+#if [ ${OS} == "SunOS" ];then
+#       cd /export/home/${USER_NAME}
+#else
+#       cd /home/${USER_NAME}
+#fi
+pwd
+####
+###
+##      Make sure all the scripts are in the directory
+###
+####
+if [ ! -f PositiveNegativeAccoutsTests_script.sh ];then
+        echo "
+        Required script PositiveNegativeAccoutsTests_script.sh is missing. Please copy to this directory:
+
+        `pwd`
+
+                before continuing.
+
+"
+        exit 1;
+fi;
+if [ ! -f ListInstalledPatches.sh ];then
+        echo "
+        Required script ListInstalledPatches.sh is missing. Please copy to this directory:
+
+        `pwd`
+
+                before continuing.
+
+"
+        exit 1;
+fi;
+if [ ! -f ListUsersWithCronAccess.sh ];then
+        echo "
+        Required script ListInstalledPatches.sh is missing. Please copy to this directory:
+
+        `pwd`
+
+                before continuing.
+
+"
+        exit 1;
+fi;
+if [ ! -f ListUsersWithSuperUserAccess.sh ];then
+        echo "
+        Required script ListUsersWithSuperUserAccess.sh is missing. Please copy to this directory:
+
+        `pwd`
+
+                before continuing.
+
+"
+        exit 1;
+fi;
+if [ ! -f ListPasswordConfigurationSettings.sh ];then
+        echo "
+        Required script ListPasswordConfigurationSettings.sh is missing. Please copy to this directory:
+
+        `pwd`
+
+                before continuing.
+
+"
+        exit 1;
+fi;
+if [ ! -f Run_sudo-l-U_for_each_user.sh ];then
+        echo "
+        Required script Run_sudo-l-U_for_each_user.sh is missing. Please copy to this directory:
+
+        `pwd`
+
+                before continuing.
+
+"
+        exit 1;
+fi;
+if [ ! -f UserListInformationCollectionScript.sh ];then
+        echo "
+        Required script UserListInformationCollectionScript.sh is missing. Please copy to this directory:
+
+        `pwd`
+
+                before continuing.
+
+"
+        exit 1;
+fi;
+
+####
+###
+##      Employee user account verification against Current Employee list
+###
+####
+./PositiveNegativeAccoutsTests_script.sh ${USER_NAME}
+./PasswordInformationCollectionScript.sh  ${USER_NAME}
+####
+###
+##      List Installed patches on server.
+##              Need to update script with requested dates
+###
+####
+./ListInstalledPatches.sh ${USER_NAME}
+####
+###
+##      List users with priveleage to run cron jobs
+###
+####
+./ListUsersWithCronAccess.sh ${USER_NAME}
+####
+###
+##      List users allows to run sudo su -
+###
+####
+./ListUsersWithSuperUserAccess.sh ${USER_NAME}
+####
+###
+##      List server pasword password file configuration settings
+###
+####
+./ListPasswordConfigurationSettings.sh ${USER_NAME}
+####
+###
+##      List all sudo commands all users are allowed to run
+###
+####
+./Run_sudo-l-U_for_each_user.sh ${USER_NAME}
+####
+###
+##      List all user account information:
+##              user name
+##              account description
+##              last password change
+##              last time user accessed the account
+###
+####
+./UserListInformationCollectionScript.sh ${USER_NAME}
+####
+###
+##      Remove temporray files
+###
+####
+rm ll last_login.txt temp_L_list AppAndUserAccountsList temp_list ActiveEmployeeList TerminatedEmployeeList NoLoginAccounts LockedAccounts
+####
+###
+##      chown/chmod files so we can remotly copy them
+###
+####
+echo "
+        Would you like to chown/chmod the txt files listed below:"
+ls -l *.txt
+echo "
+        This is the current working directory: "
+pwd
+echo "
+
+        Type y/Y (otherwise hit enter)"
+read CHOWN_CHMOD
+if [ "${CHOWN_CHMOD}" == "y" ] || [ "${CHMOD_CHOWN}" == "Y" ];then
+        chown ${USER_NAME} *.txt;
+        chmod o+r *.txt;
+        ls -ltr *.txt;
+fi;
+###
+##      End of Script
+###
+#
+*******************************************
+
+# cat ListUsersWithCronAccess.sh
+#!/bin/bash
+####
+###
+##      Generate user list that are allowed to run CRON jobs
+###
+####
+USER_ID=`id | awk -F"(" '{print $2}' | awk -F")" '{print $1}'`
+OS=`uname`
+HOST=`hostname`
+if [ "${USER_ID}" != "root" ];then
+        echo "
+
+
+        You are running this scripts as user: ${USER_ID}
+        You must run this script as user: root.
+        Please run:
+
+                sudo su -
+
+
+        Then cd to the target USER_NAME and run the script again
+        with the intended USER_NAME:
+
+                ${0} USER_NAME
+
+"
+        exit 1
+fi
+if [ "${1}" == "" ];then
+        echo "
+
+        You must provide a user name in order to run this successfully.
+                Please try again...
+
+        ${0} USER_NAME
+
+
+";
+        exit 1;
+else
+        USER_NAME=${1};
+fi;
+#if [ ${OS} == "SunOS" ];then
+#       cd /export/home/${USER_NAME}
+#else
+#       cd /home/${USER_NAME}
+#fi
+if [ ${OS} == "SunOS" ] ; then
+        echo "User list with cron access on Server ${HOST}" > ${HOST}_user_cron_access.txt 2>&1
+        ls /etc/cron.d/cron.allow
+        if [ $? != "0" ];then
+                echo "cron.allow file does not exsist." >> ${HOST}_user_cron_access.txt 2>&1
+        else
+                ls -l /etc/cron.d/cron.allow >> ${HOST}_user_cron_access.txt 2>&1
+                cat  /etc/cron.d/cron.allow >> ${HOST}_user_cron_access.txt 2>&1
+        fi
+        ls /etc/cron.d/cron.deny
+        if [ $? != "0" ];then
+                echo "cron.deny file does not exsist." >> ${HOST}_user_cron_access.txt 2>&1
+        else
+                ls -l /etc/cron.d/cron.deny >> ${HOST}_user_cron_access.txt 2>&1
+                cat  /etc/cron.d/cron.deny >> ${HOST}_user_cron_access.txt 2>&1
+        fi
+elif [ ${OS} == "HP-UX" ] ; then
+        echo "User list with cron access on Server ${HOST}" > ${HOST}_user_cron_access.txt 2>&1
+        ls /usr/lib/cron/cron.allow
+        if [ $? != "0" ];then
+                echo "cron.allow file does not exsist." >> ${HOST}_user_cron_access.txt 2>&1
+        else
+                ls -l /usr/lib/cron/cron.allow >> ${HOST}_user_cron_access.txt 2>&1
+                cat  /usr/lib/cron/cron.allow >> ${HOST}_user_cron_access.txt 2>&1
+        fi
+        ls /usr/lib/cron/cron.deny
+        if [ $? != "0" ];then
+                echo "cron.deny file does not exsist." >> ${HOST}_user_cron_access.txt 2>&1
+        else
+                ls -l /usr/lib/cron/cron.deny >> ${HOST}_user_cron_access.txt 2>&1
+                cat  /usr/lib/cron/cron.deny >> ${HOST}_user_cron_access.txt 2>&1
+        fi
+else
+        echo "User list with cron access on Server ${HOST}" > ${HOST}_user_cron_access.txt 2>&1
+        ls /etc/cron.allow
+        if [ $? != "0" ];then
+                echo "cron.allow file does not exsist." >> ${HOST}_user_cron_access.txt 2>&1
+        else
+                ls -l /etc/cron.allow >> ${HOST}_user_cron_access.txt 2>&1
+                cat  /etc/cron.allow >> ${HOST}_user_cron_access.txt 2>&1
+        fi
+        ls /etc/cron.deny
+        if [ $? != "0" ];then
+                echo "cron.deny file does not exsist. " >> ${HOST}_user_cron_access.txt 2>&1
+        else
+                ls -l /etc/cron.deny >> ${HOST}_user_cron_access.txt 2>&1
+                cat  /etc/cron.deny >> ${HOST}_user_cron_access.txt 2>&1
+        fi
+fi
+####
+###
+##      chown/chmod files so we can remotly copy them
+###
+####
+echo "
+        Would you like to chown/chmod the txt files listed below:"
+ls -l *.txt
+echo "
+        This is the current working directory: "
+pwd
+echo "
+        Type y/Y (otherwise hit enter)"
+read CHOWN_CHMOD
+if [ "${CHOWN_CHMOD}" == "y" ] || [ "${CHMOD_CHOWN}" == "Y" ];then
+        chown ${USER_NAME} *.txt;
+        chmod o+r *.txt;
+        ls -ltr *.txt;
+fi;
+###
+##      End of ListUsersWithCronAccess.sh
+###
+**********************************************
+
+# cat Run_sudo-l-U_for_each_user.sh
+####
+###
+##              FLEETCOR TECHNOLOGIES
+##                      IT INFRASTRUCTURE
+##                      SOX COMPLIANCE DATA COLECTION SCRIPTS
+##
+##              Created by Angel Madera July 2012
+##              Revision:
+##              Date    |       Description
+##      ----------------+----------------------------------------
+##                      |
+##                      |
+##
+###
+####
+###
+##
+##      This needs to be run as root
+##
+##      This will not work propery on Solaris
+##
+###
+####
+USER_ID=`id | awk -F"(" '{print $2}' | awk -F")" '{print $1}'`
+if [ ${USER_ID}  != "root" ];then
+        echo "
+
+
+        You are running this scripts as user: ${USER_ID}
+        You must run this script as user: root.
+        Please run:
+
+                sudo su -
+
+
+        Then cd to the target USER_NAME and run the script again
+        with the intended USER_NAME:
+
+                ${0} USER_NAME
+
+";
+        exit 1;
+fi;
+if [ "${1}" == "" ];then
+        echo "
+
+        You must provide a user name in order to run this successfully.
+                Please try again...
+
+        ${0} USER_NAME
+
+
+";
+        exit 1;
+else
+        USER_NAME=${1};
+fi;
+OS=`uname`
+HOST=`hostname`;
+#if [ ${OS} == "SunOS" ];then
+#       cd /export/home/${USER_NAME}
+#else
+#       cd /home/${USER_NAME}
+#fi
+pwd
+if [ ${OS} == "SunOS" ];then
+        echo "
+
+
+        ${HOST} is a Solaris server and cannot run sudo -l -U for each user without that users password.
+
+
+" > ${HOST}_sudo-l-U_for_each_user.txt;
+else
+        if [ ${OS} == "Linux" ]; then
+                egrep "csh|ksh|bash|zsh" /etc/passwd | awk -F":" '{print $1}' > /tmp/list;
+                SUDOERS_FILE=`sudo -V | grep "Sudoers path" | awk '{print $3}'`;
+        else
+                passwd -sa|egrep -v "LK|NL"|awk '{print $1}'> /tmp/list;
+                SUDOERS_FILE="/opt/csw/etc/sudoers";
+        fi
+        for i in `cat /tmp/list` ; do
+                sudo -l -U ${i}
+        done > ${HOST}_sudo-l-U_for_each_user.txt;
+fi;
+####
+###
+##      Remove temporray files
+###
+####
+rm /tmp/list;
+####
+###
+##      chown/chmod files so we can remotly copy them
+###
+####
+echo "
+        Would you like to chown/chmod the txt files listed below:"
+ls -l *.txt
+echo "
+        This is the current working directory: "
+pwd
+echo "
+        Type y/Y (otherwise hit enter)"
+read CHOWN_CHMOD
+if [ "${CHOWN_CHMOD}" == "y" ] || [ "${CHMOD_CHOWN}" == "Y" ];then
+        chown ${USER_NAME} *.txt;
+        chmod o+r *.txt;
+        ls -ltr *.txt;
+fi;
+###
+##      End Of Run_sudo-l-U_for_each_user.sh
+###
+**************************
+USATLFCAP001
+USATLFCAP002 
+USATLFNDB
+
+*******************************************
+Ansible : IT automation ,configuration management and provisioning tool
+It uses playbook to deploy ,manage,build,test and configuration anything from full server environment to website to custom complied source code for applications.
+
+Features : no need to install agent and management
+built on top of python and hence provides a lot of phyton's functionality 
+uses ssh for secure connection
+follows push based arch for sending  configuration
+very easy and fast to setup
+
+push based vs Pull based 
+:
+
+tool like puppet and chef are pull based
+Ansible is Push based : Central servere pushes the configuration information on target server
+you control when the changes are made on the server
+
+
+playbook(YAML code) :
+it is human readable and developed ina basic text language.
+
+commands :ansible-playbook file.yml
+
+
+Requirement to create ansible test :
+1.  I have choosen four servers with user test @ test password.
+
+2.user test 
+
+3.key genretation for all three servers from Master server ;ansible working using key only 
+
+4. give test for all root access in sudo 
+sudoers 
+in all serers 
+and we are going to use only using test user .
+
+a: master server : Ip details 
+test@35.154.116.94
+
+
+node1; test@35.154.201.40 node1 
+
+
+********************
+Master ansible
+ec2-35-154-116-94.ap-south-1.compute.amazonaws.com
+	
+35.154.116.94
+35.154.116.94
+
+172.31.12.98
+******************
+node1
+ec2-35-154-201-40.ap-south-1.compute.amazonaws.com
+35.154.201.40
+172.31.5.150
+************************************
+node2
+ec2-35-154-211-2.ap-south-1.compute.amazonaws.com
+35.154.211.2
+172.31.14.111
+*******************************
+node3
+ec2-35-154-28-248.ap-south-1.compute.amazonaws.com
+35.154.28.248
+172.31.4.75
+*************************************
+
+2>ssh key gen is required to acces sall servers with out any password 
+ssh-keygen
+ssh-copy-id
+
+to all servers 
+********************
+So we done with part 1 communication between all nodes .
+
+
+step 2:
+Setup and configuration :
+
+a.ansible.com installation : we have to check the repo is available for epel or not .if not :
+
+
+[test@ip-172-31-12-98 ~]$ wget http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-9.noarch.rpm
+
+sudo rpm -ivh epel-release-7-9.noarch.rpm
+
+
+**********************************
+
+step3: update the all mechine updated or not,if not need to update all the nodes.
+
+
+*********************************
+step 4: 
+
+install ansible in all nodes :
+#sudo yum install ansible -y
+check the version : #ansible --version
+conf file : /etc/ansible/ansible.cfg
+
+sudo cp /etc/ansible/ansible.cfg /etc/ansible/ansible.cfg.original
+
+lof file : /var/log/ansible.log
+*******************8
+step 5 :check the pythone file are installed or not 
+:sudo yum list installed | grep -i python
+
+how to check the pythone versuion :
+
+[test@ip-172-31-12-98 ~]$ python
+Python 2.7.5 (default, Aug  2 2016, 04:20:16) 
+[GCC 4.8.5 20150623 (Red Hat 4.8.5-4)] on linux2
+Type "help", 
+*****************
+set the path for ansible :
+
+test : [test@ip-172-31-12-98 ansible]$ set|grep -i ansible
+PWD=/etc/ansible
+
+****
+set new path :
+
+export ANSIBLE_CONFIG=/home/test/config/myansible.cfg
+********************
+Inventory Management 
+************************
+The Hosts file  :
+
+
+[test@ip-172-31-12-98 ansible]$ ansible all --list-hosts
+ [WARNING]: provided hosts list is empty, only localhost is available
+
+ [WARNING]: No hosts matched, nothing to do
+
+  hosts (0):
+[test@ip-172-31-12-98 ansible]$ clear
+
+[test@ip-172-31-12-98 ansible]$ ls
+ansible.cfg  ansible.cfg.org  hosts  roles
+[test@ip-172-31-12-98 ansible]$ vi hosts
+
+[1]+  Stopped                 vi hosts
+[test@ip-172-31-12-98 ansible]$ sudo vi hosts
+
+[test@ip-172-31-12-98 ansible]$ ansible all --list-hosts
+  hosts (3):
+    172.31.14.111
+    172.31.5.150
+    localhost
+[test@ip-172-31-12-98 ansible]$ sudo vi hosts
+[test@ip-172-31-12-98 ansible]$ sudo vi hosts
+[test@ip-172-31-12-98 ansible]$ ansiblewebapache -m ping
+-bash: ansiblewebapache: command not found
+[test@ip-172-31-12-98 ansible]$ ansible webapache -m ping
+172.31.5.150 | SUCCESS => {
+    "changed": false, 
+    "ping": "pong"
+}
+172.31.14.111 | SUCCESS => {
+    "changed": false, 
+    "ping": "pong"
+}
+172.31.4.75 | SUCCESS => {
+    "changed": false, 
+    "ping": "pong"
+}
+[test@ip-172-31-12-98 ansible]$ sudo vi hosts
+[test@ip-172-31-12-98 ansible]$ ansible myhost -m ping
+172.31.4.75 | SUCCESS => {
+    "changed": false, 
+    "ping": "pong"
+}
+[test@ip-172-31-12-98 ansible]$
+
+******************
+
+2.ansible Play book :
+
+
